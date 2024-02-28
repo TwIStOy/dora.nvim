@@ -63,10 +63,19 @@ return {
       opts.capabilities or {}
     )
 
-    ---@type dora.config
-    local config = require("dora.config")
-    local function resolve_server_cmd(server)
-      -- TODO(Hawtian Wang): resolve server executable in cmd from config.nix
+    local function get_default_cmd(server)
+      local default_config =
+        require("lspconfig.server_configurations." .. server).default_config
+      return default_config.cmd
+    end
+
+    ---@param cmd string[]
+    local function try_to_replace_executable_from_nix(cmd)
+      local executable = cmd[1]
+      ---@type dora.config
+      local config = require("dora.config")
+      local new_executable = config.nix.resolve_bin(executable)
+      return { new_executable, unpack(cmd, 2) }
     end
 
     ---@param server string
@@ -78,6 +87,13 @@ return {
       server_opts = vim.tbl_deep_extend("force", {
         capabilities = vim.deepcopy(capabilities),
       }, server_opts)
+
+      if server_opts.cmd ~= nil then
+        server_opts.cmd = try_to_replace_executable_from_nix(server_opts.cmd)
+      else
+        server_opts.cmd =
+          try_to_replace_executable_from_nix(get_default_cmd(server))
+      end
 
       if server_setup ~= nil and server_setup(server, server_opts) then
         return
