@@ -16,4 +16,6 @@ function M.opts(name)
   return Plugin.values(plugin, "opts", false)
 end
 
+-- LazyPlugins
+
 return M
