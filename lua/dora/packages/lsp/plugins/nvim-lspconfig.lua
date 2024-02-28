@@ -63,6 +63,12 @@ return {
       opts.capabilities or {}
     )
 
+    ---@type dora.config
+    local config = require("dora.config")
+    local function resolve_server_cmd(server)
+      -- TODO(Hawtian Wang): resolve server executable in cmd from config.nix
+    end
+
     ---@param server string
     local function setup_server(server)
       local server_opts = opts.servers.opts[server] or {}
