@@ -30,8 +30,8 @@ return {
     },
     {
       "topaxi/gh-actions.nvim",
-      nixpkg = "gh-actions-nvim",
       name = "gh-actions.nvim",
+      pname = "gh-actions-nvim",
       cmd = { "GhActions" },
       dependencies = { "nvim-lua/plenary.nvim", "MunifTanjim/nui.nvim" },
       build = "make",

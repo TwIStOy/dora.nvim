@@ -10,7 +10,15 @@ local get_all_packages = require("dora.lib.func").call_once(function()
     )
     :wait()
   if obj.code == 0 then
-    return vim.split(obj.stdout or "", "\n", { trimempty = true })
+    ---@type string[]
+    local lines = vim.split(obj.stdout or "", "\n", { trimempty = true })
+    local res = {}
+    for _, value in ipairs(lines) do
+      if value:find("vimplugin-") then
+        res[#res + 1] = value
+      end
+    end
+    return res
   else
     return {}
   end
@@ -22,16 +30,32 @@ local search_cache = require("dora.lib.func").new_cache_manager()
 ---@param query string
 ---@return string[]
 function M.search_nix_store(query)
+  local packages = get_all_packages()
   return search_cache:ensure(query, function()
-    local packages = get_all_packages()
     local results = {}
     for _, package in ipairs(packages) do
-      if package:find(query) then
+      if package:find(query, 1, true) then
         table.insert(results, package)
       end
     end
     return results
   end)
+end
+
+---@param plugin dora.core.plugin.PluginOption
+---@return string
+function M.normalize_plugin_pname(plugin)
+  if plugin.pname == nil then
+    return plugin.name
+  else
+    if type(plugin.pname) == "function" then
+      return plugin.pname(plugin)
+    elseif type(plugin.pname) == "string" then
+      return plugin.pname
+    else
+      error("invalid pname type")
+    end
+  end
 end
 
 return M

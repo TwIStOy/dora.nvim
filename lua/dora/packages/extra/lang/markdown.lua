@@ -25,7 +25,6 @@ return {
     {
       "iamcco/markdown-preview.nvim",
       name = "markdown-preview.nvim",
-      nixpkg = "markdown-preview-nvim",
       ft = { "markdown" },
       build = function()
         vim.fn["mkdp#util#install"]()

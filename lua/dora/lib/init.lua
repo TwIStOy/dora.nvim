@@ -16,4 +16,7 @@ M.fs = require("dora.lib.fs")
 ---@type dora.lib.lazy
 M.lazy = require("dora.lib.lazy")
 
+---@type dora.lib.nix
+M.nix = require("dora.lib.nix")
+
 return M
