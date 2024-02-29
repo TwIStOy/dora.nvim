@@ -55,10 +55,10 @@ A language server for librime
         end
 
         local function rime_ls_auto_confirm()
+          print("trigger")
           if not vim.g.global_rime_enabled then
             return
           end
-          print("trigger")
           local cmp = require("cmp")
           local entries = cmp.core.view:get_entries()
           if entries == nil or #entries == 0 then
@@ -147,8 +147,8 @@ A language server for librime
             callback = function()
               if just_inserted then
                 -- check completion
-                just_inserted = false
                 rime_ls_auto_confirm()
+                just_inserted = false
               end
             end,
           })
