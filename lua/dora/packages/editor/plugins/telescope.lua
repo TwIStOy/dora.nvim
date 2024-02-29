@@ -71,15 +71,6 @@ return {
     config = function(_, opts)
       require("telescope").setup(opts)
       require("telescope").load_extension("fzf")
-
-      -- require("telescope").load_extension("possession")
-      -- require("telescope").load_extension("command_palette")
-      -- require("telescope").load_extension("projects")
-      -- if require("ht.core.globals").has_obsidian_vault then
-      --   require("telescope").load_extension("obsidian")
-      -- end
-      -- require("telescope").load_extension("my_find_files")
-      --
     end,
     actions = function()
       ---@type dora.core.action
