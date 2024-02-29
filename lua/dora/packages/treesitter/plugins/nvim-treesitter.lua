@@ -24,7 +24,6 @@ return {
         "bash",
         "cmake",
         "css",
-        "dart",
         "diff",
         "dockerfile",
         "dot",

@@ -7,6 +7,7 @@ return {
     "hrsh7th/cmp-buffer",
     "hrsh7th/cmp-path",
     "hrsh7th/cmp-calc",
+    "lukas-reineke/cmp-under-comparator",
   },
   opts = function()
     local cmp = require("cmp")
@@ -80,7 +81,7 @@ return {
           cmp.config.compare.offset,
           cmp.config.compare.exact,
           cmp.config.compare.score,
-          -- require("clangd_extensions.cmp_scores"),
+          require("cmp-under-comparator").under,
           cmp.config.compare.locality,
           cmp.config.compare.recently_used,
           cmp.config.compare.kind,

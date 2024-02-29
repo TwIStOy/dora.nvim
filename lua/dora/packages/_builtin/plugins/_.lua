@@ -22,6 +22,7 @@ return {
     config = function(_, opts)
       require("toggleterm").setup(opts)
     end,
+    lazy = true,
     opts = {
       open_mapping = "<C-t>",
       hide_numbers = true,

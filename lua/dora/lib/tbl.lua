@@ -27,11 +27,13 @@ function M.list_reverse(lst)
 end
 
 ---@param t table
+---@param keys string[]
 ---@return table
 function M.filter_out_keys(t, keys)
   local res = {}
+  vim.tbl_add_reverse_lookup(keys)
   for k, v in pairs(t) do
-    if not vim.tbl_contains(keys, k) then
+    if keys[k] ~= nil then
       res[k] = v
     end
   end

@@ -115,6 +115,8 @@ return {
                 memory_usage = { border = "rounded" },
                 symbol_info = { border = "rounded" },
               }
+
+              return true
             end,
           },
         },

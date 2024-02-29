@@ -63,9 +63,14 @@ return {
       opts.capabilities or {}
     )
 
+    ---@return string[]?
     local function get_default_cmd(server)
-      local default_config =
-        require("lspconfig.server_configurations." .. server).default_config
+      local ok, server_module =
+        pcall(require, "lspconfig.server_configurations." .. server)
+      if not ok then
+        return nil
+      end
+      local default_config = server_module.default_config
       return default_config.cmd
     end
 
@@ -91,8 +96,10 @@ return {
       if server_opts.cmd ~= nil then
         server_opts.cmd = try_to_replace_executable_from_nix(server_opts.cmd)
       else
-        server_opts.cmd =
-          try_to_replace_executable_from_nix(get_default_cmd(server))
+        local default_cmd = get_default_cmd(server)
+        if default_cmd ~= nil then
+          server_opts.cmd = try_to_replace_executable_from_nix(default_cmd)
+        end
       end
 
       if server_setup ~= nil and server_setup(server, server_opts) then
