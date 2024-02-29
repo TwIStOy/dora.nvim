@@ -42,13 +42,37 @@ function M.setup(opts)
 
   lib.lazy.setup_on_lazy_plugins()
 
-  require("lazy").setup {
+  local lazy_opts = {
     spec = specs,
     change_detection = { enabled = false },
     install = {
       missing = true,
     },
-    dev = {
+    performance = {
+      cache = { enabled = true },
+      install = { colorscheme = { "tokyonight", "habamax" } },
+      rtp = {
+        paths = {
+          -- dora.nvim default install path
+          vim.fn.stdpath("data") .. "/dora.nvim",
+        },
+        disabled_plugins = {
+          "gzip",
+          "matchit",
+          "matchparen",
+          "netrwPlugin",
+          "tarPlugin",
+          "tohtml",
+          "tutor",
+          "zipPlugin",
+          "spellfile",
+        },
+      },
+    },
+  }
+
+  if lib.nix.has_nix_store() then
+    lazy_opts.dev = {
       path = function(plugin)
         local pname = lib.nix.normalize_plugin_pname(plugin)
         local resolved_path = config.nix.resolve_pkg(pname)
@@ -75,29 +99,10 @@ function M.setup(opts)
       end,
       patterns = { "/" }, -- hack to make sure all plugins are `dev`
       fallback = true,
-    },
-    performance = {
-      cache = { enabled = true },
-      install = { colorscheme = { "tokyonight", "habamax" } },
-      rtp = {
-        paths = {
-          -- dora.nvim default install path
-          vim.fn.stdpath("data") .. "/dora.nvim",
-        },
-        disabled_plugins = {
-          "gzip",
-          "matchit",
-          "matchparen",
-          "netrwPlugin",
-          "tarPlugin",
-          "tohtml",
-          "tutor",
-          "zipPlugin",
-          "spellfile",
-        },
-      },
-    },
-  }
+    }
+  end
+
+  require("lazy").setup(lazy_opts)
 
   lib.lazy.fix_valid_fields()
 

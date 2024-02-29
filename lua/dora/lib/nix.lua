@@ -58,4 +58,9 @@ function M.normalize_plugin_pname(plugin)
   end
 end
 
+---@return boolean
+M.has_nix_store = require("dora.lib.func").call_once(function()
+  return vim.fn.executable("nix-store") == 1
+end)
+
 return M
