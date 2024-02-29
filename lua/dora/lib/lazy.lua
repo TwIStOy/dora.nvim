@@ -6,6 +6,16 @@ function M.has(plugin)
   return require("lazy.core.config").spec.plugins[plugin] ~= nil
 end
 
+---@param plugin string
+---@return boolean
+function M.loaded(plugin)
+  local p = require("lazy.core.config").spec.plugins[plugin]
+  if p == nil then
+    return false
+  end
+  return not not p._.loaded
+end
+
 ---@param name string
 function M.opts(name)
   local plugin = require("lazy.core.config").plugins[name]

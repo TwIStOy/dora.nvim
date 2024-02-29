@@ -79,14 +79,14 @@ function M.input_then_exec(cmd)
   end
 end
 
----@param callback fun(client?: lsp.Client, buffer: number)
+---@param callback fun(client?: lsp.Client, buffer: number): boolean?
 function M.on_lsp_attach(callback)
   vim.api.nvim_create_autocmd("LspAttach", {
     callback = function(args)
       local buffer = args.buf ---@type number
       ---@type lsp.Client?
       local client = vim.lsp.get_client_by_id(args.data.client_id)
-      callback(client, buffer)
+      return callback(client, buffer)
     end,
   })
 end

@@ -6,28 +6,28 @@ local M = {}
 local CacheManager = {}
 
 CacheManager.new = function()
-	local self = setmetatable({}, { __index = CacheManager })
-	self.entries = {}
-	return self
+  local self = setmetatable({}, { __index = CacheManager })
+  self.entries = {}
+  return self
 end
 
 ---Get cache value
 ---@param key string|string[]
 ---@return any|nil
 function CacheManager:get(key)
-	key = self:key(key)
-	if self.entries[key] ~= nil then
-		return self.entries[key]
-	end
-	return nil
+  key = self:key(key)
+  if self.entries[key] ~= nil then
+    return self.entries[key]
+  end
+  return nil
 end
 
 ---Set cache value explicitly
 ---@param key string|string[]
 ---@vararg any
 function CacheManager:set(key, value)
-	key = self:key(key)
-	self.entries[key] = value
+  key = self:key(key)
+  self.entries[key] = value
 end
 
 ---Ensure value by callback
@@ -36,56 +36,56 @@ end
 ---@param callback fun(): T
 ---@return T
 function CacheManager:ensure(key, callback)
-	local value = self:get(key)
-	if value == nil then
-		local v = callback()
-		self:set(key, v)
-		return v
-	end
-	return value
+  local value = self:get(key)
+  if value == nil then
+    local v = callback()
+    self:set(key, v)
+    return v
+  end
+  return value
 end
 
 ---Clear all cache entries
 function CacheManager:clear()
-	self.entries = {}
+  self.entries = {}
 end
 
 ---Create key
 ---@param key string|string[]
 ---@return string
 function CacheManager:key(key)
-	if type(key) == "table" then
-		local res = ""
-		for _, v in ipairs(key) do
-			if type(v) == "string" then
-				res = res .. v
-			else
-				res = res .. tostring(v)
-			end
-		end
-		return res
-	end
-	return key
+  if type(key) == "table" then
+    local res = ""
+    for _, v in ipairs(key) do
+      if type(v) == "string" then
+        res = res .. v
+      else
+        res = res .. tostring(v)
+      end
+    end
+    return res
+  end
+  return key
 end
 
 ---@return dora.lib.CacheManager
 function M.new_cache_manager()
-	return CacheManager.new()
+  return CacheManager.new()
 end
 
 ---@generic T
 ---@param fun fun():T
 ---@return T
 function M.call_once(fun)
-	local res
-	local called = false
-	return function()
-		if not called then
-			res = fun()
-			called = true
-		end
-		return res
-	end
+  local res
+  local called = false
+  return function()
+    if not called then
+      res = fun()
+      called = true
+    end
+    return res
+  end
 end
 
 ---@generic T
@@ -93,30 +93,64 @@ end
 ---@param callback fun(module): T
 ---@return T?
 function M.require_then(name, callback)
-	local has_module, module = pcall(require, name)
-	if has_module then
-		return callback(module)
-	end
+  local has_module, module = pcall(require, name)
+  if has_module then
+    return callback(module)
+  end
 end
 
 ---@param callback string|fun(): any
 ---@param feedkeys? boolean
 ---@return fun(): any
 function M.normalize_callback(callback, feedkeys)
-	if type(callback) == "string" then
-		if feedkeys == true then
-			return function()
-				local key = vim.api.nvim_replace_termcodes(callback .. "<Ignore>", true, false, true)
-				vim.api.nvim_feedkeys(key, "t", false)
-			end
-		else
-			return function()
-				vim.api.nvim_command(callback)
-			end
-		end
-	else
-		return callback
-	end
+  if type(callback) == "string" then
+    if feedkeys == true then
+      return function()
+        local key = vim.api.nvim_replace_termcodes(
+          callback .. "<Ignore>",
+          true,
+          false,
+          true
+        )
+        vim.api.nvim_feedkeys(key, "t", false)
+      end
+    else
+      return function()
+        vim.api.nvim_command(callback)
+      end
+    end
+  else
+    return callback
+  end
+end
+
+---@generic F: function
+---@param callback F
+---@return F
+function M.throttle(delay, callback)
+  local timer = vim.loop.new_timer()
+  local running = false
+  local first = true
+
+  return function(...)
+    local args = { ... }
+    local wrapped = function()
+      callback(unpack(args))
+    end
+    if not running then
+      if first then
+        wrapped()
+        first = false
+      end
+
+      timer:start(delay, 0, function()
+        running = false
+        vim.schedule(wrapped)
+      end)
+
+      running = true
+    end
+  end
 end
 
 return M
