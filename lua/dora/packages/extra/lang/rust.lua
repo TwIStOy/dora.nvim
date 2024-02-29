@@ -8,6 +8,14 @@ return {
   },
   plugins = {
     {
+      "nvim-treesitter",
+      opts = function(_, opts)
+        if type(opts.ensure_installed) == "table" then
+          vim.list_extend(opts.ensure_installed, { "rust" })
+        end
+      end,
+    },
+    {
       "saecki/crates.nvim",
       dependencies = { "nvim-lua/plenary.nvim", "MunifTanjim/nui.nvim" },
       event = {

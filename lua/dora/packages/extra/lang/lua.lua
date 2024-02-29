@@ -11,9 +11,6 @@ return {
       "nvim-treesitter",
       opts = function(_, opts)
         if type(opts.ensure_installed) == "table" then
-          if vim.list_contains(opts.ensure_installed, "lua") then
-            return
-          end
           vim.list_extend(opts.ensure_installed, { "lua" })
         end
       end,
