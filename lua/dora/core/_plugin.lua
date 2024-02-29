@@ -5,3 +5,4 @@
 
 ---@class dora.core.plugin.PluginOption: dora.core.plugin.ExtraPluginOptions,LazyPluginSpec
 
+---@class dora.core.plugin.Plugin: dora.core.plugin.PluginOption,LazyPlugin

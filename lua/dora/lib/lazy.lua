@@ -65,41 +65,10 @@ function M.fix_gui_cond(plugin)
   return false
 end
 
-function M.setup_on_lazy_plugins()
+function M.setup_on_lazy_plugins(callback)
   vim.api.nvim_create_autocmd("User", {
     pattern = "LazyPlugins",
-    callback = function()
-      for _, _plugin in pairs(require("lazy.core.config").spec.plugins) do
-        local plugin = _plugin --[[@as LazyPlugin]]
-        if
-          (plugin._.kind ~= "disabled" or plugin._.kind ~= "clean")
-          and plugin.actions ~= nil
-        then
-          -- inject keys defined in actions
-          local all_keys
-          if plugin.keys == nil then
-            all_keys = {}
-          elseif vim.tbl_isarray(plugin.keys) then
-            all_keys = plugin.keys
-          else
-            all_keys = { plugin.keys }
-          end
-          local actions
-          if type(plugin.actions) == "function" then
-            actions = plugin.actions()
-          elseif vim.tbl_isarray(plugin.actions) then
-            actions = plugin.actions
-          else
-            actions = { plugin.actions }
-          end
-          for _, action_spec in ipairs(actions) do
-            local action = require("dora.core.action").new_action(action_spec)
-            vim.list_extend(all_keys, action:into_lazy_keys())
-          end
-          plugin.keys = all_keys
-        end
-      end
-    end,
+    callback = callback,
   })
 end
 
