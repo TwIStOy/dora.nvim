@@ -185,7 +185,7 @@ return {
       "conform.nvim",
       opts = {
         formatters_by_ft = {
-          dart = { "dartfmt" },
+          dart = { "dart_format" },
         },
       },
     },

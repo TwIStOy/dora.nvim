@@ -134,7 +134,7 @@ return {
       "conform.nvim",
       opts = {
         formatters_by_ft = {
-          rust = { "rust_format" },
+          rust = { "rustfmt" },
         },
       },
     },
@@ -253,10 +253,6 @@ return {
           },
         }
       end,
-    },
-    {
-      "nvim-lspconfig",
-      opts = {},
     },
   },
 }
