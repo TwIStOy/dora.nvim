@@ -56,8 +56,6 @@ end
 function M.current_gui()
   if vim.g.vscode then
     return "vscode"
-  elseif vim.g.neovide then
-    return "neovide"
   else
     return nil
   end
