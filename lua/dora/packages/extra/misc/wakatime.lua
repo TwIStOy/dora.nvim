@@ -6,6 +6,7 @@ return {
       "wakatime/vim-wakatime",
       event = "BufReadPost",
       opts = {},
+      config = function() end,
     },
   },
 }
