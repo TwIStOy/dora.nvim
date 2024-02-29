@@ -23,6 +23,7 @@ local M = {
 ---@field ui? dora.config.ui.SetupOptions
 ---@field packages? string[]
 ---@field vim? dora.config.vim.SetupOption
+---@field lazy? LazyConfig|fun(opts:LazyConfig):any
 
 ---@param opts dora.config.SetupOptions
 function M.setup(opts)

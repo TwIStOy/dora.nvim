@@ -18,17 +18,17 @@ local M = {}
 
 ---@param opts? dora.config.SetupOptions
 function M.setup(opts)
+  opts = opts or {}
+
   ---@type dora.config
   local config = require("dora.config")
-  ---@type dora.core
-  local core = require("dora.core")
   ---@type dora.lib
   local lib = require("dora.lib")
 
   -- set mapleader at very beginning of profile
   vim.api.nvim_set_var("mapleader", " ")
 
-  config.setup(opts or {})
+  config.setup(opts)
 
   local specs = {}
   local packages = config.package.sorted_package()
@@ -133,6 +133,14 @@ function M.setup(opts)
       patterns = { "/" }, -- hack to make sure all plugins are `dev`
       fallback = true,
     }
+  end
+
+  if opts.lazy ~= nil then
+    if type(opts.lazy) == "function" then
+      opts.lazy = opts.lazy(lazy_opts)
+    else
+      lazy_opts = vim.tbl_deep_extend("force", lazy_opts, opts.lazy)
+    end
   end
 
   require("lazy").setup(lazy_opts)
