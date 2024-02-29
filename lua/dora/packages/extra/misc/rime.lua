@@ -54,12 +54,16 @@ A language server for librime
               == "rime_ls"
         end
 
-        local function rime_ls_auto_confirm()
-          print("trigger")
-          if not vim.g.global_rime_enabled then
+        local function text_edit_range_length(entry)
+          local range = entry.completion_item.textEdit.range
+          return range["end"].character - range.start.character
+        end
+
+        local rime_ls_auto_confirm = vim.schedule_wrap(function()
+          local cmp = require("cmp")
+          if not vim.g.global_rime_enabled or not cmp.visible() then
             return
           end
-          local cmp = require("cmp")
           local entries = cmp.core.view:get_entries()
           if entries == nil or #entries == 0 then
             return
@@ -78,10 +82,14 @@ A language server for librime
             first_entry ~= nil
             and rime_ls_entries_cnt == 1
             and is_rime_entry(first_entry)
+            and text_edit_range_length(first_entry) == 4
           then
-            cmp.confirm { behavior = cmp.ConfirmBehavior.Insert, select = true }
+            cmp.confirm {
+              behavior = cmp.ConfirmBehavior.Insert,
+              select = true,
+            }
           end
-        end
+        end)
 
         lib.vim.on_lsp_attach(function(client, bufnr)
           local toggle_rime = function()
@@ -90,7 +98,7 @@ A language server for librime
               { command = "rime-ls.toggle-rime" },
               function(_, result, ctx, _)
                 if ctx.client_id == client.id then
-                  vim.g.global_rime_enabled = result
+                  vim.g.global_rime_enabled = not not result
                 end
               end,
               bufnr
@@ -144,7 +152,7 @@ A language server for librime
           })
           vim.api.nvim_create_autocmd({ "TextChangedI", "TextChangedP" }, {
             buffer = bufnr,
-            callback = function()
+            callback = function(ev)
               if just_inserted then
                 -- check completion
                 rime_ls_auto_confirm()
