@@ -60,7 +60,6 @@ return {
         completeopt = "menu,menuone,noselect,noinsert,preview",
       },
       mapping = {
-        -- cmp.mapping(i_cr_action, { "i", "c" }),
         ["<CR>"] = cmp.mapping.confirm { select = true },
         ["<C-p>"] = cmp.mapping.select_prev_item {},
         ["<C-n>"] = cmp.mapping.select_next_item {},
