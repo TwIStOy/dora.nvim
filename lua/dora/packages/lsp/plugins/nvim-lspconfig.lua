@@ -102,9 +102,9 @@ return {
         end
       end
 
-      if server_setup ~= nil and server_setup(server, server_opts) then
+      if server_setup ~= nil then
         return
-      elseif common_setup and common_setup(server, server_opts) then
+      elseif common_setup ~= nil then
         return
       else
         require("lspconfig")[server].setup(server_opts)

@@ -20,7 +20,7 @@ return {
       opts = {
         servers = {
           opts = {
-            sourcekip = {},
+            sourcekit = {},
           },
         },
       },

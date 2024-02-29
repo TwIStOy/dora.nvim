@@ -138,5 +138,125 @@ return {
         },
       },
     },
+    {
+      "mrcjkb/rustaceanvim",
+      version = "^3",
+      lazy = true,
+      dependencies = { "nvim-lua/plenary.nvim", "mfussenegger/nvim-dap" },
+      actions = function()
+        ---@type dora.core.action
+        local action = require("dora.core.action")
+
+        return action.make_options {
+          from = "rustaceanvim",
+          category = "Rustaceanvim",
+          condition = function(buf)
+            for _, server in ipairs(buf.lsp_servers) do
+              if server.name == "rust-analyzer" then
+                return true
+              end
+            end
+            return false
+          end,
+          actions = {
+            {
+              id = "rustaceanvim.expand-macro",
+              title = "Expand macro",
+              callback = function()
+                vim.api.nvim_command("RustLsp expandMacro")
+              end,
+            },
+            {
+              id = "rustaceanvim.rebuild-proc-macro",
+              title = "Rebuild proc macro",
+              callback = function()
+                vim.api.nvim_command("RustLsp rebuildProcMacros")
+              end,
+            },
+            {
+              id = "rustaceanvim.move-item-up",
+              title = "Move item up",
+              callback = function()
+                vim.api.nvim_command("RustLsp moveItem up")
+              end,
+            },
+            {
+              id = "rustaceanvim.move-item-down",
+              title = "Move item down",
+              callback = function()
+                vim.api.nvim_command("RustLsp moveItem down")
+              end,
+            },
+            {
+              id = "rustaceanvim.hover-actions",
+              title = "Hover actions",
+              callback = function()
+                vim.api.nvim_command("RustLsp hover actions")
+              end,
+            },
+            {
+              id = "rustaceanvim.hover-range",
+              title = "Hover range",
+              callback = function()
+                vim.api.nvim_command("RustLsp hover range")
+              end,
+            },
+            {
+              id = "rustaceanvim.explain-errors",
+              title = "Explain errors",
+              callback = function()
+                vim.api.nvim_command("RustLsp explainError")
+              end,
+            },
+            {
+              id = "rustaceanvim.render-diagnostic",
+              title = "Render diagnostic",
+              callback = function()
+                vim.api.nvim_command("RustLsp renderDiagnostic")
+              end,
+            },
+            {
+              id = "rustaceanvim.open-cargo-toml",
+              title = "Open cargo.toml of this file",
+              callback = function()
+                vim.api.nvim_command("RustLsp openCargo")
+              end,
+            },
+            {
+              id = "rustaceanvim.open-parent-module",
+              title = "Open parent module of this file",
+              callback = function()
+                vim.api.nvim_command("RustLsp parentModule")
+              end,
+            },
+            {
+              id = "rustaceanvim.join-lines",
+              title = "Join lines",
+              callback = function()
+                vim.api.nvim_command("RustLsp joinLines")
+              end,
+            },
+            {
+              id = "rustaceanvim.structural-search-replace",
+              title = "Structural search replace",
+              callback = function()
+                vim.api.nvim_command("RustLsp ssr")
+              end,
+            },
+            {
+              id = "rustaceanvim.view-syntax-tree",
+              title = "View syntax tree",
+              callback = function()
+                vim.api.nvim_command("RustLsp syntaxTree")
+              end,
+            },
+          },
+        }
+      end,
+    },
+    {
+      "nvim-lspconfig",
+      opts = {},
+    },
   },
 }
