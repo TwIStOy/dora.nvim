@@ -4,17 +4,6 @@ return {
   deps = {},
   plugins = {
     {
-      "folke/drop.nvim",
-      event = "VimEnter",
-      cond = function()
-        return vim.fn.argc() == 0
-      end,
-      opts = {
-        theme = "snow",
-        screensaver = false,
-      },
-    },
-    {
       "NvChad/nvim-colorizer.lua",
       ft = { "vim", "lua" },
       cmd = {
