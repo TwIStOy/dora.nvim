@@ -42,36 +42,42 @@ return {
     },
     -- event = "VeryLazy",
     config = function(_, opts)
-      -- local async = require("plenary.async")
-      -- local async_lib = require("plenary.async_lib")
-      -- local co = coroutine
+      ---@type dora.lib.promise
+      local promise = require("dora.lib.promise")
+
+      local check_registry_outdated = function()
+        if opts.extra.registry_outdated_check_interval < 0 then
+          -- disable
+          return false
+        end
+        local lib = require("dora.lib")
+        local mason_settings = require("mason.settings").current
+        local mason_root = mason_settings.install_root_dir
+
+        local Path = require("plenary.path")
+        local marker_file = Path:new(mason_root) / "registry-last-update"
+        local content = lib.fs.read_file(tostring(marker_file))
+        local last_update = 0
+        if content ~= nil then
+          content = vim.trim(content)
+          last_update = tonumber(content) or 0
+        end
+        local now = os.time(os.date("!*t") --[[@as osdateparam]])
+        return now - last_update
+          > 60 * 60 * 24 * opts.extra.registry_outdated_check_interval
+      end
+      local update_registry = function()
+        return promise.new_promise(function(resolve)
+          local next
+          if check_registry_outdated() then
+            next = promise.wrap(require("mason-registry").update)
+          end
+          resolve(next)
+        end)
+      end
+
+      -- promise.wrap(function()
       --
-      -- ---@type dora.lib.promise
-      -- local promise = require("dora.lib.promise")
-      --
-      -- local update_registry = promise.wrap(require("mason-registry").update)
-      --
-      -- local check_registry_outdated = promise.wrap(function()
-      --   local lib = require("dora.lib")
-      --   local mason_settings = require("mason.settings").current
-      --   local mason_root = mason_settings.install_root_dir
-      --
-      --   local Path = require("plenary.path")
-      --   local marker_file = Path:new(mason_root) / "registry-last-update"
-      --   local content = lib.fs.read_file(tostring(marker_file))
-      --   local last_update = 0
-      --   if content ~= nil then
-      --     content = vim.trim(content)
-      --     last_update = tonumber(content) or 0
-      --   end
-      --   local now = os.time(os.date("!*t") --[[@as osdateparam]])
-      --   if
-      --     now - last_update
-      --     < 60 * 60 * 24 * opts.extra.registry_outdated_check_interval
-      --   then
-      --     return false
-      --   end
-      --   return true
       -- end)
       --
       -- check_registry_outdated():next(function(outdated)

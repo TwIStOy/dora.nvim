@@ -232,15 +232,14 @@ M.await = function(thing)
   co.yield(thing)
 end
 
----@return fun():dora.lib.promise.Promise
-M.wrap = function(callback)
-  return function()
-    return M.new_promise(function(resolve)
-      callback(function()
-        resolve()
-      end)
+---@param func fun(function):any
+---@return dora.lib.promise.Promise
+M.wrap = function(func)
+  return M.new_promise(function(resolve)
+    func(function()
+      resolve()
     end)
-  end
+  end)
 end
 
 return M
