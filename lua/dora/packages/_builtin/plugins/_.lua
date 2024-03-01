@@ -27,6 +27,7 @@ return {
       extra = {
         registry_outdated_check_interval = 1, -- in days
         ensure_installed = {},
+        update_installed_packages = true,
       },
     },
     cmd = {
@@ -42,8 +43,8 @@ return {
     },
     -- event = "VeryLazy",
     config = function(_, opts)
-      ---@type dora.lib.promise
-      local promise = require("dora.lib.promise")
+      ---@type dora.lib.async
+      local async = require("dora.lib.async")
 
       local check_registry_outdated = function()
         if opts.extra.registry_outdated_check_interval < 0 then
@@ -66,187 +67,108 @@ return {
         return now - last_update
           > 60 * 60 * 24 * opts.extra.registry_outdated_check_interval
       end
-      local update_registry = function()
-        return promise.new_promise(function(resolve)
-          local next
-          if check_registry_outdated() then
-            next = promise.wrap(require("mason-registry").update)
-          end
-          resolve(next)
-        end)
+
+      local function install_package(pkg)
+        if pkg:is_installed() then
+          return
+        end
+        local handle = pkg:install()
+        handle:once(
+          "closed",
+          vim.schedule_wrap(function()
+            if pkg:is_installed() then
+              vim.notify(
+                ("%s was successfully installed"):format(pkg),
+                vim.log.levels.INFO,
+                {
+                  title = "mason.nvim",
+                  render = "compact",
+                }
+              )
+            else
+              vim.notify(
+                ("Failed to install %s"):format(pkg),
+                vim.log.levels.ERROR,
+                {
+                  title = "mason.nvim",
+                  render = "compact",
+                }
+              )
+            end
+          end)
+        )
       end
 
-      -- promise.wrap(function()
-      --
-      -- end)
-      --
-      -- check_registry_outdated():next(function(outdated)
-      --   if outdated then
-      --   end
-      -- end)
-      --
-      -- local function try_to_update_registry()
-      --   if opts.extra.registry_outdated_check_interval < 0 then
-      --     -- disable
-      --     return false
-      --   end
-      --
-      --   ---@type dora.lib
-      --   local lib = require("dora.lib")
-      --   local mason_settings = require("mason.settings").current
-      --   local mason_root = mason_settings.install_root_dir
-      --
-      --   local Path = require("plenary.path")
-      --   ---@type Path
-      --   local marker_file = Path:new(mason_root) / "registry-last-update"
-      --   local content = lib.fs.read_file(tostring(marker_file))
-      --   local last_update = 0
-      --   if content ~= nil then
-      --     content = vim.trim(content)
-      --     last_update = tonumber(content) or 0
-      --   end
-      --   local now = os.time(os.date("!*t") --[[@as osdateparam]])
-      --   if
-      --     now - last_update
-      --     < 60 * 60 * 24 * opts.extra.registry_outdated_check_interval
-      --   then
-      --     return false
-      --   end
-      --   local registry = require("mason-registry")
-      --
-      --   -- registry.update
-      --
-      --   registry.update(function()
-      --     vim.notify("Mason-registry updated!", vim.log.levels.INFO, {
-      --       title = "mason.nvim",
-      --       render = "compact",
-      --     })
-      --   end)
-      -- end
-      --
-      -- local function install_package(pkg)
-      --   if pkg:is_installed() then
-      --     return
-      --   end
-      --   local handle = pkg:install()
-      --   handle:once(
-      --     "closed",
-      --     vim.schedule_wrap(function()
-      --       if pkg:is_installed() then
-      --         vim.notify(
-      --           ("%s was successfully installed"):format(pkg),
-      --           vim.log.levels.INFO,
-      --           {
-      --             title = "mason.nvim",
-      --             render = "compact",
-      --           }
-      --         )
-      --       else
-      --         vim.notify(
-      --           ("Failed to install %s"):format(pkg),
-      --           vim.log.levels.ERROR,
-      --           {
-      --             title = "mason.nvim",
-      --             render = "compact",
-      --           }
-      --         )
-      --       end
-      --     end)
-      --   )
-      -- end
-      --
-      -- local function install_missing_packages()
-      --   local registry = require("mason-registry")
-      --   for _, name in ipairs(opts.extra.ensure_installed) do
-      --     local pkg = registry.get_package(name)
-      --     if pkg == nil then
-      --       vim.notify(
-      --         ("%s is not a Mason package. Please check your config"):format(
-      --           name
-      --         ),
-      --         vim.log.levels.WARN,
-      --         {
-      --           title = "mason.nvim",
-      --           render = "compact",
-      --         }
-      --       )
-      --     end
-      --     install_package(pkg)
-      --   end
-      -- end
-      --
-      -- local function update_installed_packages()
-      --   local registry = require("mason-registry")
-      -- end
-      --
-      -- local function after_mason_setup()
-      --   try_to_update_registry()
-      -- end
-      --
-      -- -- async function installAndUpgradePackages() {
-      -- --   let registry = luaRequire("mason-registry");
-      -- --
-      -- --   let upgradePackages: Promise<VersionCheckResult>[] = [];
-      -- --   let promises: Promise<void>[] = [];
-      -- --
-      -- --   for (let fmt of AllMaybeMasonPackage) {
-      -- --     let spec = fmt.asMasonSpec();
-      -- --     if (!spec) continue;
-      -- --
-      -- --     let pkg = registry.get_package(spec.name);
-      -- --     if (isNil(pkg)) {
-      -- --       vim.notify(`"${spec.name}" is not a Mason package`, vim.log.levels.INFO, {
-      -- --         title: "Mason",
-      -- --         render: "compact",
-      -- --       });
-      -- --       continue;
-      -- --     }
-      -- --     if (!pkg.is_installed()) {
-      -- --       promises.push(installPackage(pkg, spec.name));
-      -- --     } else {
-      -- --       upgradePackages.push(checkPackage(pkg, spec.name));
-      -- --     }
-      -- --   }
-      -- --
-      -- --   if (upgradePackages.length > 0) {
-      -- --     await registryUpdate().then(() => {
-      -- --       vim.notify("Registry updated!", vim.log.levels.INFO, {
-      -- --         title: "Mason",
-      -- --         render: "compact",
-      -- --       });
-      -- --     });
-      -- --     promises.push(
-      -- --       Promise.all(upgradePackages).then((results) => {
-      -- --         let outdatedPackages = results.filter((r) => r.outdated);
-      -- --         if (outdatedPackages.length === 0) {
-      -- --           vim.notify(`All tools are up to date!`, vim.log.levels.INFO, {
-      -- --             title: "Mason",
-      -- --             render: "compact",
-      -- --           });
-      -- --         } else {
-      -- --           let names = outdatedPackages.map((r) => r.name).join("\n  ");
-      -- --           vim.notify(
-      -- --             `The following tools should be updated:\n  ${names}`,
-      -- --             vim.log.levels.WARN,
-      -- --             {
-      -- --               title: "Mason",
-      -- --             }
-      -- --           );
-      -- --         }
-      -- --       })
-      -- --     );
-      -- --   }
-      -- --
-      -- --   await Promise.all(promises);
-      -- -- }
-      -- --
-      -- -- function config(_: any, opts: AnyNotNil) {
-      -- --   luaRequire("mason").setup(opts);
-      -- --   installAndUpgradePackages();
-      -- -- }
-      -- vim.defer_fn(function()
-      --   require("mason").setup(opts)
-      -- end, 200)
+      local function check_package_outdated(pkg)
+        local ok, new_version = async.wrap(pkg.check_new_version)(pkg)
+        if not ok then
+          vim.notify(
+            ("Failed to check new version for %s"):format(pkg),
+            vim.log.levels.ERROR,
+            {
+              title = "mason.nvim",
+              render = "compact",
+            }
+          )
+          return nil
+        end
+        if new_version.current_version ~= new_version.latest_version then
+          return new_version.name
+        end
+      end
+
+      local function install_missing_or_update_packages()
+        local registry = require("mason-registry")
+        local outdated_packages = {}
+        for _, name in ipairs(opts.extra.ensure_installed) do
+          local pkg = registry.get_package(name)
+          if pkg == nil then
+            vim.notify(
+              ("%s is not a Mason package. Please check your config"):format(
+                name
+              ),
+              vim.log.levels.WARN,
+              {
+                title = "mason.nvim",
+                render = "compact",
+              }
+            )
+          end
+          install_package(pkg)
+          if opts.extra.update_installed_packages then
+            if check_package_outdated(pkg) ~= nil then
+              outdated_packages[#outdated_packages + 1] = name
+            end
+          end
+        end
+      end
+
+      local do_setup = coroutine.wrap(function()
+        if check_registry_outdated() then
+          local ok, data = async.wrap(require("mason-registry").update)()
+          if ok then
+            vim.notify("Mason-registry updated!", vim.log.levels.INFO, {
+              title = "mason.nvim",
+              render = "compact",
+            })
+          else
+            vim.notify(
+              "Mason-registry update failed, reason: " .. tostring(data),
+              vim.log.levels.ERROR,
+              {
+                title = "mason.nvim",
+                render = "compact",
+              }
+            )
+          end
+        end
+        install_missing_or_update_packages()
+      end)
+
+      vim.defer_fn(function()
+        require("mason").setup(opts)
+        do_setup()
+      end, 200)
     end,
     actions = function()
       ---@type dora.core.action
