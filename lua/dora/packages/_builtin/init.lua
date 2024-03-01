@@ -149,5 +149,6 @@ return {
   setup = function()
     require("dora.packages._builtin.setup.options")()
     require("dora.packages._builtin.setup.keymaps")()
+    require("dora.packages._builtin.setup.autocmds")()
   end,
 }

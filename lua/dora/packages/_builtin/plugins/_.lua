@@ -14,6 +14,277 @@ return {
     gui = "all",
   },
   {
+    "williamboman/mason.nvim",
+    opts = {
+      PATH = "skip",
+      ui = {
+        icons = {
+          package_installed = " ",
+          package_pending = " ",
+          package_uninstalled = " ",
+        },
+      },
+      extra = {
+        registry_outdated_check_interval = 1, -- in days
+        ensure_installed = {},
+      },
+    },
+    cmd = {
+      "Mason",
+      "MasonUpdate",
+      "MasonInstall",
+      "MasonUninstall",
+      "MasonUninstallAll",
+      "MasonLog",
+    },
+    dependencies = {
+      "plenary.nvim",
+    },
+    -- event = "VeryLazy",
+    config = function(_, opts)
+      -- local async = require("plenary.async")
+      -- local async_lib = require("plenary.async_lib")
+      -- local co = coroutine
+      --
+      -- ---@type dora.lib.promise
+      -- local promise = require("dora.lib.promise")
+      --
+      -- local update_registry = promise.wrap(require("mason-registry").update)
+      --
+      -- local check_registry_outdated = promise.wrap(function()
+      --   local lib = require("dora.lib")
+      --   local mason_settings = require("mason.settings").current
+      --   local mason_root = mason_settings.install_root_dir
+      --
+      --   local Path = require("plenary.path")
+      --   local marker_file = Path:new(mason_root) / "registry-last-update"
+      --   local content = lib.fs.read_file(tostring(marker_file))
+      --   local last_update = 0
+      --   if content ~= nil then
+      --     content = vim.trim(content)
+      --     last_update = tonumber(content) or 0
+      --   end
+      --   local now = os.time(os.date("!*t") --[[@as osdateparam]])
+      --   if
+      --     now - last_update
+      --     < 60 * 60 * 24 * opts.extra.registry_outdated_check_interval
+      --   then
+      --     return false
+      --   end
+      --   return true
+      -- end)
+      --
+      -- check_registry_outdated():next(function(outdated)
+      --   if outdated then
+      --   end
+      -- end)
+      --
+      -- local function try_to_update_registry()
+      --   if opts.extra.registry_outdated_check_interval < 0 then
+      --     -- disable
+      --     return false
+      --   end
+      --
+      --   ---@type dora.lib
+      --   local lib = require("dora.lib")
+      --   local mason_settings = require("mason.settings").current
+      --   local mason_root = mason_settings.install_root_dir
+      --
+      --   local Path = require("plenary.path")
+      --   ---@type Path
+      --   local marker_file = Path:new(mason_root) / "registry-last-update"
+      --   local content = lib.fs.read_file(tostring(marker_file))
+      --   local last_update = 0
+      --   if content ~= nil then
+      --     content = vim.trim(content)
+      --     last_update = tonumber(content) or 0
+      --   end
+      --   local now = os.time(os.date("!*t") --[[@as osdateparam]])
+      --   if
+      --     now - last_update
+      --     < 60 * 60 * 24 * opts.extra.registry_outdated_check_interval
+      --   then
+      --     return false
+      --   end
+      --   local registry = require("mason-registry")
+      --
+      --   -- registry.update
+      --
+      --   registry.update(function()
+      --     vim.notify("Mason-registry updated!", vim.log.levels.INFO, {
+      --       title = "mason.nvim",
+      --       render = "compact",
+      --     })
+      --   end)
+      -- end
+      --
+      -- local function install_package(pkg)
+      --   if pkg:is_installed() then
+      --     return
+      --   end
+      --   local handle = pkg:install()
+      --   handle:once(
+      --     "closed",
+      --     vim.schedule_wrap(function()
+      --       if pkg:is_installed() then
+      --         vim.notify(
+      --           ("%s was successfully installed"):format(pkg),
+      --           vim.log.levels.INFO,
+      --           {
+      --             title = "mason.nvim",
+      --             render = "compact",
+      --           }
+      --         )
+      --       else
+      --         vim.notify(
+      --           ("Failed to install %s"):format(pkg),
+      --           vim.log.levels.ERROR,
+      --           {
+      --             title = "mason.nvim",
+      --             render = "compact",
+      --           }
+      --         )
+      --       end
+      --     end)
+      --   )
+      -- end
+      --
+      -- local function install_missing_packages()
+      --   local registry = require("mason-registry")
+      --   for _, name in ipairs(opts.extra.ensure_installed) do
+      --     local pkg = registry.get_package(name)
+      --     if pkg == nil then
+      --       vim.notify(
+      --         ("%s is not a Mason package. Please check your config"):format(
+      --           name
+      --         ),
+      --         vim.log.levels.WARN,
+      --         {
+      --           title = "mason.nvim",
+      --           render = "compact",
+      --         }
+      --       )
+      --     end
+      --     install_package(pkg)
+      --   end
+      -- end
+      --
+      -- local function update_installed_packages()
+      --   local registry = require("mason-registry")
+      -- end
+      --
+      -- local function after_mason_setup()
+      --   try_to_update_registry()
+      -- end
+      --
+      -- -- async function installAndUpgradePackages() {
+      -- --   let registry = luaRequire("mason-registry");
+      -- --
+      -- --   let upgradePackages: Promise<VersionCheckResult>[] = [];
+      -- --   let promises: Promise<void>[] = [];
+      -- --
+      -- --   for (let fmt of AllMaybeMasonPackage) {
+      -- --     let spec = fmt.asMasonSpec();
+      -- --     if (!spec) continue;
+      -- --
+      -- --     let pkg = registry.get_package(spec.name);
+      -- --     if (isNil(pkg)) {
+      -- --       vim.notify(`"${spec.name}" is not a Mason package`, vim.log.levels.INFO, {
+      -- --         title: "Mason",
+      -- --         render: "compact",
+      -- --       });
+      -- --       continue;
+      -- --     }
+      -- --     if (!pkg.is_installed()) {
+      -- --       promises.push(installPackage(pkg, spec.name));
+      -- --     } else {
+      -- --       upgradePackages.push(checkPackage(pkg, spec.name));
+      -- --     }
+      -- --   }
+      -- --
+      -- --   if (upgradePackages.length > 0) {
+      -- --     await registryUpdate().then(() => {
+      -- --       vim.notify("Registry updated!", vim.log.levels.INFO, {
+      -- --         title: "Mason",
+      -- --         render: "compact",
+      -- --       });
+      -- --     });
+      -- --     promises.push(
+      -- --       Promise.all(upgradePackages).then((results) => {
+      -- --         let outdatedPackages = results.filter((r) => r.outdated);
+      -- --         if (outdatedPackages.length === 0) {
+      -- --           vim.notify(`All tools are up to date!`, vim.log.levels.INFO, {
+      -- --             title: "Mason",
+      -- --             render: "compact",
+      -- --           });
+      -- --         } else {
+      -- --           let names = outdatedPackages.map((r) => r.name).join("\n  ");
+      -- --           vim.notify(
+      -- --             `The following tools should be updated:\n  ${names}`,
+      -- --             vim.log.levels.WARN,
+      -- --             {
+      -- --               title: "Mason",
+      -- --             }
+      -- --           );
+      -- --         }
+      -- --       })
+      -- --     );
+      -- --   }
+      -- --
+      -- --   await Promise.all(promises);
+      -- -- }
+      -- --
+      -- -- function config(_: any, opts: AnyNotNil) {
+      -- --   luaRequire("mason").setup(opts);
+      -- --   installAndUpgradePackages();
+      -- -- }
+      -- vim.defer_fn(function()
+      --   require("mason").setup(opts)
+      -- end, 200)
+    end,
+    actions = function()
+      ---@type dora.core.action
+      local action = require("dora.core.action")
+
+      return action.make_options {
+        from = "mason.nvim",
+        category = "Mason",
+        actions = {
+          {
+            id = "mason.open-window",
+            title = "Open mason window",
+            callback = "Mason",
+          },
+          {
+            id = "mason.install",
+            title = "Install a tool",
+            callback = "MasonInstall",
+          },
+          {
+            id = "mason.update",
+            title = "Update a tool",
+            callback = "MasonUpdate",
+          },
+          {
+            id = "mason.uninstall",
+            title = "Uninstall a tool",
+            callback = "MasonUninstall",
+          },
+          {
+            id = "mason.uninstall-all",
+            title = "Uninstall all tools",
+            callback = "MasonUninstallAll",
+          },
+          {
+            id = "mason.show-log",
+            title = "Show mason log",
+            callback = "MasonLog",
+          },
+        },
+      }
+    end,
+  },
+  {
     "akinsho/toggleterm.nvim",
     version = "*",
     init = function() -- code to run before plugin loaded

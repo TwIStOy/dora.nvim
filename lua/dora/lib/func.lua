@@ -45,6 +45,20 @@ function CacheManager:ensure(key, callback)
   return value
 end
 
+---Wrap callback with cache
+---@generic Args
+---@generic T
+---@param callback fun(...: Args): T
+---@return fun(...: Args): T
+function CacheManager:wrap(callback)
+  return function(...)
+    local args = { ... }
+    return self:ensure(args, function()
+      return callback(unpack(args))
+    end)
+  end
+end
+
 ---Clear all cache entries
 function CacheManager:clear()
   self.entries = {}

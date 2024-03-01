@@ -63,4 +63,10 @@ M.has_nix_store = require("dora.lib.func").call_once(function()
   return vim.fn.executable("nix-store") == 1
 end)
 
+---@return boolean
+M.is_nixos = require("dora.lib.func").call_once(function()
+  local version = vim.uv.os_uname().version
+  return version:find("NixOs", 1, true) ~= nil
+end)
+
 return M
