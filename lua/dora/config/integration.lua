@@ -6,7 +6,10 @@ local M = {}
 ---@field enable_lazygit? boolean
 
 ---@type dora.config.integration.SetupOptions
-local default_options = {}
+local default_options = {
+  enable_lazygit = true,
+  enable_yazi = true,
+}
 
 M._ = default_options
 
