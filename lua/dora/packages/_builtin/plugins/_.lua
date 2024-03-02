@@ -41,7 +41,7 @@ return {
     dependencies = {
       "plenary.nvim",
     },
-    -- event = "VeryLazy",
+    event = "VeryLazy",
     config = function(_, opts)
       ---@type dora.lib.async
       local async = require("dora.lib.async")
