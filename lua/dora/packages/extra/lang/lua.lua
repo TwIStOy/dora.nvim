@@ -38,21 +38,23 @@ return {
         end
 
         opts.servers.opts.lua_ls = {
-          Lua = {
-            runtime = {
-              version = "LuaJIT",
-              path = vim.split(package.path, ";"),
-            },
-            diagnostics = {
-              globals = { "vim" },
-              disable = {},
-            },
-            workspace = { library = libraries },
-            format = {
-              enable = true,
-              defaultConfig = {
-                indent_style = "space",
-                continuation_indent_size = "2",
+          settings = {
+            Lua = {
+              runtime = {
+                version = "LuaJIT",
+                path = vim.split(package.path, ";"),
+              },
+              diagnostics = {
+                globals = { "vim" },
+                disable = {},
+              },
+              workspace = { library = libraries },
+              format = {
+                enable = true,
+                defaultConfig = {
+                  indent_style = "space",
+                  continuation_indent_size = "2",
+                },
               },
             },
           },
