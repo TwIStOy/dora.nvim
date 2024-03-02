@@ -16,6 +16,16 @@ return {
       end,
     },
     {
+      "mason.nvim",
+      opts = function(_, opts)
+        vim.list_extend(opts.extra.ensure_installed, {
+          "clangd",
+          "cpplint",
+          "clang-format",
+        })
+      end,
+    },
+    {
       "nvim-lspconfig",
       opts = {
         servers = {
@@ -193,7 +203,7 @@ return {
       "mfussenegger/nvim-lint",
       event = { "BufReadPost", "BufNewFile" },
       opts = function(_, opts)
-        opts.linters_by_ft.cpp = { "cpplint", "cppcheck" }
+        opts.linters_by_ft.cpp = { "cpplint" }
       end,
     },
     {

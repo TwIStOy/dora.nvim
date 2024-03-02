@@ -25,7 +25,7 @@ return {
         },
       },
       extra = {
-        registry_outdated_check_interval = 1, -- in days
+        outdated_check_interval = 1, -- in days
         ensure_installed = {},
         update_installed_packages = true,
       },
@@ -47,7 +47,8 @@ return {
       local async = require("dora.lib.async")
 
       local check_registry_outdated = function()
-        if opts.extra.registry_outdated_check_interval < 0 then
+        local interval = vim.F.if_nil(opts.extra.outdated_check_interval, 1)
+        if interval < 0 then
           -- disable
           return false
         end
@@ -64,8 +65,7 @@ return {
           last_update = tonumber(content) or 0
         end
         local now = os.time(os.date("!*t") --[[@as osdateparam]])
-        return now - last_update
-          > 60 * 60 * 24 * opts.extra.registry_outdated_check_interval
+        return now - last_update > 60 * 60 * 24 * interval
       end
 
       local function install_package(pkg)
@@ -101,18 +101,7 @@ return {
 
       local function check_package_outdated(pkg)
         local ok, new_version = async.wrap(pkg.check_new_version)(pkg)
-        if not ok then
-          vim.notify(
-            ("Failed to check new version for %s"):format(pkg),
-            vim.log.levels.ERROR,
-            {
-              title = "mason.nvim",
-              render = "compact",
-            }
-          )
-          return nil
-        end
-        if new_version.current_version ~= new_version.latest_version then
+        if ok then
           return new_version.name
         end
       end
@@ -120,6 +109,7 @@ return {
       local function install_missing_or_update_packages()
         local registry = require("mason-registry")
         local outdated_packages = {}
+        print(vim.inspect(opts.extra.ensure_installed))
         for _, name in ipairs(opts.extra.ensure_installed) do
           local pkg = registry.get_package(name)
           if pkg == nil then
@@ -133,11 +123,15 @@ return {
                 render = "compact",
               }
             )
-          end
-          install_package(pkg)
-          if opts.extra.update_installed_packages then
-            if check_package_outdated(pkg) ~= nil then
-              outdated_packages[#outdated_packages + 1] = name
+          else
+            if pkg:is_installed() then
+              if opts.extra.update_installed_packages then
+                if check_package_outdated(pkg) ~= nil then
+                  outdated_packages[#outdated_packages + 1] = name
+                end
+              end
+            else
+              install_package(pkg)
             end
           end
         end
