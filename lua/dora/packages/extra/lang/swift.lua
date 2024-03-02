@@ -22,6 +22,14 @@ return {
           opts = {
             sourcekit = {},
           },
+          setup = {
+            sourcekit = function(_, server_opts)
+              if vim.uv.os_uname().sysname == "Darwin" then
+                -- skip if not on macOS
+                require("lspconfig").sourcekit.setup(server_opts)
+              end
+            end,
+          },
         },
       },
     },

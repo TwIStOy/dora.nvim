@@ -7,7 +7,7 @@ return {
       build = "make install",
       cmd = { "Dash", "DashWord" },
       enabled = function()
-        return vim.loop.os_uname().sysname == "Darwin"
+        return vim.uv.os_uname().sysname == "Darwin"
       end,
       opts = {
         dash_app_path = "/Applications/Dash.app",

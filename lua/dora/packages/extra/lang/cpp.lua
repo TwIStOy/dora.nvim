@@ -72,7 +72,7 @@ return {
             },
           },
           setup = {
-            clangd = function()
+            clangd = function(_, server_opts)
               ---@type dora.lib
               local lib = require("dora.lib")
 
@@ -125,6 +125,9 @@ return {
                 memory_usage = { border = "rounded" },
                 symbol_info = { border = "rounded" },
               }
+
+              -- call default setup function
+              require("lspconfig").clangd.setup(server_opts)
 
               return true
             end,
