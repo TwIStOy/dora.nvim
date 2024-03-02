@@ -43,8 +43,16 @@ return {
     },
     event = "VeryLazy",
     config = function(_, opts)
-      ---@type dora.lib.async
-      local async = require("dora.lib.async")
+      ---@type dora.lib
+      local lib = require("dora.lib")
+
+      local last_update_marker = (function()
+        local mason_settings = require("mason.settings").current
+        local mason_root = mason_settings.install_root_dir
+        local Path = require("plenary.path")
+        local marker_file = Path:new(mason_root) / "registry-last-update"
+        return tostring(marker_file)
+      end)()
 
       local check_registry_outdated = function()
         local interval = vim.F.if_nil(opts.extra.outdated_check_interval, 1)
@@ -52,20 +60,18 @@ return {
           -- disable
           return false
         end
-        local lib = require("dora.lib")
-        local mason_settings = require("mason.settings").current
-        local mason_root = mason_settings.install_root_dir
-
-        local Path = require("plenary.path")
-        local marker_file = Path:new(mason_root) / "registry-last-update"
-        local content = lib.fs.read_file(tostring(marker_file))
+        local content = lib.fs.read_file(last_update_marker)
         local last_update = 0
         if content ~= nil then
           content = vim.trim(content)
           last_update = tonumber(content) or 0
         end
         local now = os.time(os.date("!*t") --[[@as osdateparam]])
-        return now - last_update > 60 * 60 * 24 * interval
+        if now - last_update > 60 * 60 * 24 * interval then
+          lib.fs.write_file(last_update_marker, tostring(now))
+          return true
+        end
+        return false
       end
 
       local function install_package(pkg)
@@ -100,7 +106,7 @@ return {
       end
 
       local function check_package_outdated(pkg)
-        local ok, new_version = async.wrap(pkg.check_new_version)(pkg)
+        local ok, new_version = lib.async.wrap(pkg.check_new_version)(pkg)
         if ok then
           return new_version.name
         end
@@ -109,7 +115,6 @@ return {
       local function install_missing_or_update_packages()
         local registry = require("mason-registry")
         local outdated_packages = {}
-        print(vim.inspect(opts.extra.ensure_installed))
         for _, name in ipairs(opts.extra.ensure_installed) do
           local pkg = registry.get_package(name)
           if pkg == nil then
@@ -139,7 +144,7 @@ return {
 
       local do_setup = coroutine.wrap(function()
         if check_registry_outdated() then
-          local ok, data = async.wrap(require("mason-registry").update)()
+          local ok, data = lib.async.wrap(require("mason-registry").update)()
           if ok then
             vim.notify("Mason-registry updated!", vim.log.levels.INFO, {
               title = "mason.nvim",

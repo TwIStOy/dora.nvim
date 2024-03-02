@@ -41,7 +41,7 @@ return {
         opts = vim.tbl_extend("force", {
           position = "center",
           shortcut = sc,
-          cursor = 5,
+          cursor = 3,
           width = 50,
           align_shortcut = "right",
           hl_shortcut = "Keyword",

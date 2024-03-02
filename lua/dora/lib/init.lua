@@ -19,4 +19,7 @@ M.lazy = require("dora.lib.lazy")
 ---@type dora.lib.nix
 M.nix = require("dora.lib.nix")
 
+---@type dora.lib.async
+M.async = require("dora.lib.async")
+
 return M
