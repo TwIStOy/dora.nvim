@@ -20,7 +20,7 @@ return {
         local conform = require("conform")
         conform.format {
           async = true,
-          lsp_fallback = "always",
+          lsp_fallback = true,
         }
       end,
       desc = "format-file",
@@ -70,7 +70,7 @@ return {
       end
 
       opts.formatters =
-        vim.tbl_extend("force", opts.formatters, custom_formatters)
+          vim.tbl_extend("force", opts.formatters, custom_formatters)
 
       require("conform").setup(opts)
     end
