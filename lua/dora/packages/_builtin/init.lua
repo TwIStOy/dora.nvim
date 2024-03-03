@@ -6,7 +6,7 @@ return {
   name = "dora.packages._builtin",
   plugins = lib.tbl.flatten_array {
     require("dora.packages._builtin.plugins._"),
-    { "folke/lazy.nvim", lazy = true },
+    { "folke/lazy.nvim",   lazy = true },
     { "TwIStOy/dora.nvim", lazy = true, dev = false },
     {
       "catppuccin/nvim",
