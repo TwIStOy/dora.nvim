@@ -28,7 +28,7 @@ return function()
     pattern = "*",
     callback = function(event)
       local lookup_table = vim.tbl_add_reverse_lookup(
-        vim.deepcopy(config.vim.config.cursorline_blacklist or {})
+        vim.deepcopy(config.vim.config.relative_number_blacklist or {})
       )
 
       local ft = vim.api.nvim_get_option_value("ft", { buf = event.buf })
@@ -52,7 +52,7 @@ return function()
     pattern = "*",
     callback = function(event)
       local lookup_table = vim.tbl_add_reverse_lookup(
-        vim.deepcopy(config.vim.config.cursorline_blacklist or {})
+        vim.deepcopy(config.vim.config.relative_number_blacklist or {})
       )
 
       local ft = vim.api.nvim_get_option_value("ft", { buf = event.buf })
