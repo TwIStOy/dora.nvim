@@ -59,4 +59,26 @@ function M.flatten_array(tbl)
   end
 end
 
+---@generic T
+---@param tbl T[]
+---@param fn fun(T, T):T
+---@param acc T
+function M.foldl(tbl, fn, acc)
+  for _, v in ipairs(tbl) do
+    acc = fn(acc, v)
+  end
+  return acc
+end
+
+---@generic T
+---@param tbl T[]
+---@param fn fun(T, T):T
+---@param acc T
+function M.foldr(tbl, fn, acc)
+  for i = #tbl, 1, -1 do
+    acc = fn(tbl[i], acc)
+  end
+  return acc
+end
+
 return M
