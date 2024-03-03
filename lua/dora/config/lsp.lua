@@ -145,7 +145,7 @@ function Methods.code_action()
   if vim.g.vscode then
     require("vscode-neovim").call("editor.action.quickFix")
   else
-    vim.cmd("Lspsaga code_action")
+    vim.lsp.buf.code_action()
   end
 end
 
