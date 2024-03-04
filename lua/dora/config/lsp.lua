@@ -63,8 +63,8 @@ local function get_backend(method)
   ---@type dora.lib
   local lib = require("dora.lib")
   return vim.F.if_nil(
-    lib.tbl.optional_field(M.config, "backend", method),
-    lib.tbl.optional_field(M.config, "backend", "*"),
+    vim.tbl_get(M.config, "backend", method),
+    vim.tbl_get(M.config, "backend", "*"),
     "native"
   )
 end

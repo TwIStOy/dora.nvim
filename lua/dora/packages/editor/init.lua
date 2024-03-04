@@ -7,6 +7,7 @@ return {
   plugins = lib.tbl.flatten_array {
     require("dora.packages.editor.plugins.neo-tree"),
     require("dora.packages.editor.plugins.telescope"),
+    require("dora.packages.editor.plugins.fzf-lua"),
     require("dora.packages.editor.plugins.vim-illuminate"),
     require("dora.packages.editor.plugins.which-key"),
     require("dora.packages.editor.plugins.bookmarks"),

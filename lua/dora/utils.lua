@@ -8,7 +8,7 @@ local which_cache = require("dora.lib.func").new_cache_manager()
 ---@return string
 function M.which_binary(name)
   return which_cache:ensure(name, function()
-    if type(name) ~= 'string' then
+    if type(name) ~= "string" then
       return name
     end
 
@@ -36,6 +36,17 @@ function M.which_binary(name)
 
     return name
   end)
+end
+
+---NOTE: opts will be modified in place
+---@param opts table
+---@param default_value string
+---@param ... string
+function M.fix_opts_cmd(opts, default_value, ...)
+  local cmd = vim.F.if_nil(vim.tbl_get(opts, ...), default_value)
+  cmd = M.which_binary(cmd)
+  require("dora.lib.tbl").tbl_set(opts, cmd, ...)
+  return opts
 end
 
 return M

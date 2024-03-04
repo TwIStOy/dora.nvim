@@ -1,20 +1,6 @@
 ---@class dora.lib.tbl
 local M = {}
 
----@param t table
----@param ... string
-function M.optional_field(t, ...)
-  local keys = { ... }
-  local now = t
-  for _, key in ipairs(keys) do
-    if now[key] == nil then
-      return nil
-    end
-    now = now[key]
-  end
-  return now
-end
-
 ---Reverse given list-like table in place.
 ---NOTE: this mutates the given table.
 ---@generic T
@@ -79,6 +65,29 @@ function M.foldr(tbl, fn, acc)
     acc = fn(tbl[i], acc)
   end
   return acc
+end
+
+---@param tbl table
+---@param value any
+---@param ... string keys
+function M.tbl_set(tbl, value, ...)
+  local len = select("#", ...)
+  local keys = { ... }
+  local now = tbl
+  for i, key in ipairs(keys) do
+    if i == len then
+      now[key] = value
+    else
+      if now[key] == nil then
+        now[key] = {}
+      end
+      now = now[key]
+      if type(now) ~= "table" then
+        error("tbl_set: key " .. key .. " is not a table")
+      end
+    end
+  end
+  return tbl
 end
 
 return M
