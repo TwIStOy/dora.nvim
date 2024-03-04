@@ -105,10 +105,6 @@ return {
         end
       end
 
-      if server == "lua_ls" then
-        vim.print(server_opts.cmd)
-      end
-
       if server_setup ~= nil then
         server_setup(server, server_opts)
         return
