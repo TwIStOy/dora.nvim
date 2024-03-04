@@ -90,5 +90,14 @@ return {
         })
       end,
     },
+    {
+      "mason.nvim",
+      opts = function(_, opts)
+        vim.list_extend(opts.extra.ensure_installed, {
+          "lua-language-server",
+          "stylua",
+        })
+      end,
+    },
   },
 }

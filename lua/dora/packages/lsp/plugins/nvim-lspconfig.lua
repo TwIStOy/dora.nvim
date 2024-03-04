@@ -66,7 +66,7 @@ return {
     ---@return string[]?
     local function get_default_cmd(server)
       local ok, server_module =
-          pcall(require, "lspconfig.server_configurations." .. server)
+        pcall(require, "lspconfig.server_configurations." .. server)
       if not ok then
         return nil
       end
