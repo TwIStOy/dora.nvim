@@ -8,6 +8,10 @@ local which_cache = require("dora.lib.func").new_cache_manager()
 ---@return string
 function M.which_binary(name)
   return which_cache:ensure(name, function()
+    if type(name) ~= 'string' then
+      return name
+    end
+
     ---@type dora.lib
     local lib = require("dora.lib")
     ---@type dora.config.nix

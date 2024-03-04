@@ -43,8 +43,8 @@ return {
       end
     end
 
-    ---@type dora.config
-    local config = require("dora.config")
+    ---@type dora.utils
+    local utils = require("dora.utils")
 
     local custom_formatters = {}
     for _, formatter in ipairs(used_formatters) do
@@ -62,15 +62,15 @@ return {
       if command == nil then
         error("Formatter " .. formatter .. " does not have a command")
       end
-      local command_from_nix = config.nix.resolve_bin(command)
-      if command_from_nix ~= nil then
+      local resolved_command = utils.which_binary(command)
+      if resolved_command ~= command then
         custom_formatters[formatter] = vim.tbl_extend("force", formatter_opts, {
-          command = command_from_nix,
+          command = resolved_command,
         })
       end
 
       opts.formatters =
-          vim.tbl_extend("force", opts.formatters, custom_formatters)
+        vim.tbl_extend("force", opts.formatters, custom_formatters)
 
       require("conform").setup(opts)
     end
