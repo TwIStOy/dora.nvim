@@ -32,6 +32,7 @@ local SetupOption = {
     "flutterToolsOutline",
     "neo-tree",
     "neo-tree-popup",
+    "fzf",
     "",
   },
   ---@type string[]
