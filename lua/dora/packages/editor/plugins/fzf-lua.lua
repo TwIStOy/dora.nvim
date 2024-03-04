@@ -4,7 +4,9 @@ return {
   dependencies = {
     "nvim-web-devicons",
   },
+  lazy = true,
   opts = {},
+  cmd = { "FzfLua" },
   config = function(_, opts)
     ---@type dora.utils
     local utils = require("dora.utils")
