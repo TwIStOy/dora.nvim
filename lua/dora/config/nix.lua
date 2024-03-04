@@ -31,7 +31,7 @@ end
 ---@param opts dora.config.nix.SetupOption
 function M.setup(opts)
   M.nixpkgs = opts.pkgs or {}
-  M.bin = opts.pkgs or {}
+  M.bin = opts.bin or {}
 end
 
 return M
