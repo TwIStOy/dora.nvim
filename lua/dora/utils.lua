@@ -2,7 +2,7 @@
 local M = {}
 
 ---@type dora.lib.CacheManager
-local which_cache = require("lib.func").new_cache_manager()
+local which_cache = require("dora.lib.func").new_cache_manager()
 
 ---@param name string
 ---@return string
@@ -16,7 +16,7 @@ function M.which_binary(name)
     -- resolve binary from nix pkgs config in nixos or nix-darwin
     if lib.nix.has_nix_store() then
       local res = nix.resolve_bin(name)
-      if res == name then
+      if res ~= name then
         return res
       end
     end
@@ -25,7 +25,7 @@ function M.which_binary(name)
     if lib.lazy.has("mason.nvim") then
       local mason_root = require("mason.settings").current.install_root_dir
       local path = mason_root .. "/bin/" .. name
-      if vim.fn.executable(path) then
+      if vim.fn.executable(path) == 1 then
         return path
       end
     end

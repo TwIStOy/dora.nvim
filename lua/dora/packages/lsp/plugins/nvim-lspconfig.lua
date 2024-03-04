@@ -74,12 +74,13 @@ return {
       return default_config.cmd
     end
 
+    ---@type dora.utils
+    local Utils = require("dora.utils")
+
     ---@param cmd string[]
-    local function try_to_replace_executable_from_nix(cmd)
+    local function try_to_replace_executable_from_nix_or_mason(cmd)
       local executable = cmd[1]
-      ---@type dora.config
-      local config = require("dora.config")
-      local new_executable = config.nix.resolve_bin(executable)
+      local new_executable = Utils.which_binary(executable)
       return { new_executable, unpack(cmd, 2) }
     end
 
@@ -94,12 +95,18 @@ return {
       }, server_opts)
 
       if server_opts.cmd ~= nil then
-        server_opts.cmd = try_to_replace_executable_from_nix(server_opts.cmd)
+        server_opts.cmd =
+          try_to_replace_executable_from_nix_or_mason(server_opts.cmd)
       else
         local default_cmd = get_default_cmd(server)
         if default_cmd ~= nil then
-          server_opts.cmd = try_to_replace_executable_from_nix(default_cmd)
+          server_opts.cmd =
+            try_to_replace_executable_from_nix_or_mason(default_cmd)
         end
+      end
+
+      if server == "lua_ls" then
+        vim.print(server_opts.cmd)
       end
 
       if server_setup ~= nil then
