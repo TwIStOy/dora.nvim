@@ -56,7 +56,7 @@ return {
       },
       config = function(_, opts)
         require("crates").setup(opts)
-        require("crates").udpate()
+        require("crates").update()
       end,
       actions = function()
         ---@type dora.core.action
