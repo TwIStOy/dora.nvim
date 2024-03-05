@@ -12,6 +12,7 @@ return {
     require("dora.packages.editor.plugins.which-key"),
     require("dora.packages.editor.plugins.bookmarks"),
     require("dora.packages.editor.plugins.dial"),
+    require("dora.packages.editor.plugins.gitsigns"),
     require("dora.packages.editor.plugins._others"),
   },
 }
