@@ -19,14 +19,14 @@ return {
       end
     end
 
-    ---@type dora.config
-    local config = require("dora.config")
+    ---@type dora.utils
+    local utils = require("dora.utils")
     for _, name in pairs(used_linters) do
       local linter = require("lint").linters[name]
       if linter == nil then
         error("Linter " .. linter .. " not found")
       end
-      linter.cmd = config.nix.resolve_bin(linter.cmd)
+      linter.cmd = utils.which_binary(linter.cmd)
     end
 
     vim.api.nvim_create_autocmd("BufWritePost", {
