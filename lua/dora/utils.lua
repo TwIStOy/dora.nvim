@@ -25,6 +25,10 @@ function M.which_binary(name)
       end
     end
 
+    if nix.try_nix_only then
+      return name
+    end
+
     -- try resolve binary binaries from mason
     if lib.lazy.has("mason.nvim") then
       local mason_root = require("mason.settings").current.install_root_dir

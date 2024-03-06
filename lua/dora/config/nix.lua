@@ -7,6 +7,9 @@ M.nixpkgs = {} -- <name>: <path>
 ---@type table<string, string>
 M.bin = {} -- <name>: <path>
 
+---@type boolean
+M.try_nix_only = false
+
 ---@param name string
 ---@return string?
 function M.resolve_pkg(name)
@@ -32,6 +35,7 @@ end
 function M.setup(opts)
   M.nixpkgs = opts.pkgs or {}
   M.bin = opts.bin or {}
+  M.try_nix_only = vim.F.if_nil(opts.try_nix_only, false)
 end
 
 return M
