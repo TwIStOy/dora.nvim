@@ -141,8 +141,8 @@ return {
     {
       "mrcjkb/rustaceanvim",
       version = "^3",
-      lazy = true,
       dependencies = { "nvim-lua/plenary.nvim", "mfussenegger/nvim-dap" },
+      ft = { "rust" },
       actions = function()
         ---@type dora.core.action
         local action = require("dora.core.action")
