@@ -1,3 +1,12 @@
+local vault_dir = function()
+  ---@type dora.lib
+  local lib = require("dora.lib")
+  return vim.F.if_nil(
+    lib.lazy.opts("obsidian.nvim").dir,
+    vim.fn.expand("~/obsidian-data")
+  )
+end
+
 ---@type dora.core.package.PackageOption
 return {
   name = "dora.packages.extra.obsidian",
@@ -12,16 +21,11 @@ return {
     ---@type dora.lib
     local lib = require("dora.lib")
 
-    local dir = vim.F.if_nil(
-      lib.lazy.opts("obsidian.nvim").dir,
-      vim.fn.expand("~/obsidian-data")
-    )
-
     vim.api.nvim_create_autocmd(
       { "BufNewFile", "BufReadPost", "BufWinEnter" },
       {
         group = au_group,
-        pattern = dir .. "/**.md",
+        pattern = vault_dir() .. "/**.md",
         callback = function()
           vim.wo.conceallevel = 2
           vim.keymap.set("n", "gf", function()
@@ -37,7 +41,12 @@ return {
     {
       "epwalsh/obsidian.nvim",
       version = "*",
-      ft = "markdown",
+      event = function()
+        return {
+          ("BufReadPre %s/*.md"):format(vault_dir()),
+          ("BufNewFile %s/*.md"):format(vault_dir()),
+        }
+      end,
       dependencies = {
         "plenary.nvim",
         "telescope.nvim",
