@@ -1,6 +1,3 @@
-local _yazi
-local _lazygit
-
 ---@type dora.core.plugin.PluginOption[]
 return {
   {
@@ -262,19 +259,16 @@ return {
               return
             end
             local root = vim.fn.getcwd()
-            if not _yazi then
-              _yazi = require("toggleterm.terminal").Terminal:new {
+            require("toggleterm.terminal").Terminal
+              :new({
                 cmd = "yazi",
                 dir = root,
                 direction = "float",
                 close_on_exit = true,
                 start_in_insert = true,
                 hidden = true,
-              }
-            else
-              _yazi:change_dir(root)
-            end
-            _yazi:toggle()
+              })
+              :open()
           end,
           keys = { "<leader>ff", desc = "toggle-yazi" },
         }
@@ -303,19 +297,20 @@ return {
               )
               return
             end
-            if not _lazygit then
-              _lazygit = require("toggleterm.terminal").Terminal:new {
+            require("toggleterm.terminal").Terminal
+              :new({
                 cmd = "lazygit",
                 dir = repo_path,
                 direction = "float",
                 close_on_exit = true,
                 start_in_insert = true,
-                hidden = true,
-              }
-            else
-              _lazygit:change_dir(repo_path)
-            end
-            _lazygit:toggle()
+                on_close = function(t)
+                  vim.schedule(function()
+                    t:shutdown()
+                  end)
+                end,
+              })
+              :open()
           end,
           keys = { "<leader>g", desc = "toggle-lazygit" },
         }
