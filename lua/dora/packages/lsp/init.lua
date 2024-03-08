@@ -16,11 +16,6 @@ return {
     ---@type dora.config.lsp
     local lsp = require("dora.config.lsp")
 
-    if not vim.g.vscode then
-      -- update lsp._watchfiles
-      require("dora.packages.lsp.utils.override-fswatch")()
-    end
-
     ---@param buffer number
     local function create_lsp_autocmds(buffer)
       -- display diagnostic win on CursorHold
