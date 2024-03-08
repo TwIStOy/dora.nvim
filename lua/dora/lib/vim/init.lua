@@ -91,4 +91,7 @@ function M.on_lsp_attach(callback)
   })
 end
 
+---@type dora.lib.vim.lsp
+M.lsp = require("dora.lib.vim.lsp")
+
 return M
