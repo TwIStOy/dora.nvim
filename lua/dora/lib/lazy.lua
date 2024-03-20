@@ -39,30 +39,43 @@ M.fix_valid_fields = require("dora.lib.func").call_once(function()
 end)
 
 ---@param plugin dora.core.plugin.PluginOption
+---@return dora.core.plugin.PluginOption
 function M.fix_gui_cond(plugin)
-  local current_gui = require("lazy.lib.vim").current_gui()
+  local current_gui = require("dora.lib.vim").current_gui()
   --- in TUI, always true
   if current_gui == nil then
-    return true
+    return plugin
   end
 
   local gui = plugin.gui
-  if gui == nil then
-    return false
-  end
 
   if gui == "all" then
+    return plugin
+  end
+
+  if gui == nil then
+    plugin.cond = function()
+      return false
+    end
+    return plugin
+  end
+
+  local old_cond = plugin.cond or function()
     return true
   end
 
   if type(gui) == "string" then
-    return current_gui == plugin.gui
+    plugin.cond = function(...)
+      return old_cond(...) and current_gui == gui
+    end
   elseif type(gui) == "table" and vim.tbl_isarray(gui) then
-    return vim.list_contains(gui, current_gui)
+    plugin.cond = function(...)
+      return old_cond(...) and vim.list_contains(gui, current_gui)
+    end
   else
     vim.notify(
       "Invalid gui field in "
-        .. plugin.name
+        .. vim.inspect(plugin)
         .. ", it should be string or table, but got "
         .. vim.inspect(gui),
       vim.log.levels.WARN,
@@ -70,9 +83,8 @@ function M.fix_gui_cond(plugin)
         title = "dora.nvim",
       }
     )
+    return plugin
   end
-
-  return false
 end
 
 function M.setup_on_lazy_plugins(callback)
