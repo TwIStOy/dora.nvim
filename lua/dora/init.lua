@@ -32,9 +32,10 @@ function M.setup(opts)
 
   local specs = {}
   local packages = config.package.sorted_package()
+  local processed = {}
   for _, pkg in ipairs(packages) do
     for _, plug_opts in ipairs(pkg:plugins()) do
-      specs[#specs + 1] = lib.lazy.fix_gui_cond(plug_opts)
+      specs[#specs + 1] = lib.lazy.fix_gui_cond(plug_opts, processed)
     end
   end
 

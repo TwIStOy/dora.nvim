@@ -38,10 +38,28 @@ M.fix_valid_fields = require("dora.lib.func").call_once(function()
   health.valid[#health.valid + 1] = "gui"
 end)
 
+local function guess_name(plugin)
+  -- if has '/', use the second part as name
+  if plugin.name ~= nil then
+    return plugin.name
+  elseif string.find(plugin[1], "/") then
+    return string.match(plugin[1], ".*/(.*)")
+  else
+    return plugin[1]
+  end
+end
+
 ---@param plugin dora.core.plugin.PluginOption
 ---@return dora.core.plugin.PluginOption
-function M.fix_gui_cond(plugin)
+function M.fix_gui_cond(plugin, processed)
   local current_gui = require("dora.lib.vim").current_gui()
+
+  local name = guess_name(plugin)
+  if processed[name] then
+    return plugin
+  end
+  processed[name] = true
+
   --- in TUI, always true
   if current_gui == nil then
     return plugin
