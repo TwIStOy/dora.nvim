@@ -6,7 +6,11 @@ return {
     dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify" },
     opts = {
       lsp = {
-        progress = { enabled = false, throttle = 1000 / 10 },
+        progress = {
+          enabled = true,
+          throttle = 1000 / 10,
+          view = "mini",
+        },
         override = {
           ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
           ["vim.lsp.util.stylize_markdown"] = true,
