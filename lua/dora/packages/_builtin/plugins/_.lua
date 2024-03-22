@@ -265,6 +265,7 @@ return {
                 dir = root,
                 direction = "float",
                 close_on_exit = true,
+                float_opts = { border = "none" },
                 start_in_insert = true,
                 hidden = true,
               })
@@ -304,6 +305,7 @@ return {
                 direction = "float",
                 close_on_exit = true,
                 start_in_insert = true,
+                float_opts = { border = "none" },
                 on_close = function(t)
                   vim.schedule(function()
                     t:shutdown()
