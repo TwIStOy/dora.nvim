@@ -14,7 +14,7 @@ return {
         override = {
           ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
           ["vim.lsp.util.stylize_markdown"] = true,
-          ["cmp.entry.get_documentation"] = true,
+          -- ["cmp.entry.get_documentation"] = true,
         },
         signature = {
           enabled = false,
@@ -42,6 +42,56 @@ return {
         lsp_doc_border = false,
       },
     },
+    config = function(_, opts)
+      require("noice").setup(opts)
+
+      local Format = require("noice.lsp.format")
+      local Hacks = require("noice.util.hacks")
+
+      local function from_lsp_clangd(e)
+        return vim.tbl_get(e, "source", "name") == "nvim_lsp"
+          and vim.tbl_get(e, "source", "source", "client", "name") == "clangd"
+      end
+
+      Hacks.on_module("cmp.entry", function(mod)
+        mod.get_documentation = function(self)
+          local item = self:get_completion_item()
+
+          local lines = item.documentation
+              and Format.format_markdown(item.documentation)
+            or {}
+          local ret = table.concat(lines, "\n")
+          local detail = item.detail
+          if detail and type(detail) == "table" then
+            detail = table.concat(detail, "\n")
+          end
+
+          if from_lsp_clangd(self) then
+            local label_details = item.labelDetails
+            if
+              label_details
+              and type(label_details) == "table"
+              and label_details.detail
+            then
+              if detail == nil then
+                detail = ""
+              end
+              detail = detail .. label_details.detail
+            end
+          end
+
+          if detail and not ret:find(detail, 1, true) then
+            local ft = self.context.filetype
+            local dot_index = string.find(ft, "%.")
+            if dot_index ~= nil then
+              ft = string.sub(ft, 0, dot_index - 1)
+            end
+            ret = ("```%s\n%s\n```\n%s"):format(ft, vim.trim(detail), ret)
+          end
+          return vim.split(ret, "\n")
+        end
+      end)
+    end,
     actions = function()
       ---@type dora.core.action
       local action = require("dora.core.action")

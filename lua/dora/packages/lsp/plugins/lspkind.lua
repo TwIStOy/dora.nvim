@@ -11,10 +11,11 @@ return {
         opts.formatting = {
           fields = { "kind", "abbr", "menu" },
           format = function(entry, vim_item)
-            local kind = lspkind.cmp_format {
+            local ret = lspkind.cmp_format {
               mode = "symbol_text",
               maxwidth = 50,
               ellipsis_char = "...",
+              show_labelDetails = true,
               before = function(e, item)
                 item.menu = ({
                   buffer = "[Buf]",
@@ -38,14 +39,14 @@ return {
                 return item
               end,
             }(entry, vim_item)
-            local strings = vim.split(kind.kind, "%s", { trimempty = true })
-            kind.kind = strings[1] .. "  "
+            local strings = vim.split(ret.kind, "%s", { trimempty = true })
+            ret.kind = strings[1] .. "  "
             if strings[2] and #strings[2] > 0 then
-              kind.menu = "    (" .. strings[2] .. ")"
+              ret.menu = "    (" .. strings[2] .. ")"
             else
-              kind.menu = ""
+              ret.menu = ""
             end
-            return kind
+            return ret
           end,
         }
       end,
