@@ -40,10 +40,6 @@ return {
               style = { "underline" },
             },
             ["@variable.builtin"] = { fg = C.maroon, style = { "italic" } },
-            NormalFloat = { fg = C.text, bg = C.none },
-            NoicePopup = { fg = C.text, bg = C.none },
-            NormalNC = { fg = C.text, bg = C.none },
-            NoiceGuiDocPopupBorder = { fg = C.base, bg = C.none },
           }
         end,
         integrations = {
