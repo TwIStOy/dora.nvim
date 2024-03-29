@@ -1,6 +1,7 @@
 ---@type dora.core.plugin.PluginOption
 return {
   "ibhagwan/fzf-lua",
+  url = "https://gitlab.com/ibhagwan/fzf-lua.git",
   dependencies = {
     "nvim-web-devicons",
   },
